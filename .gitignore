@@ -1,0 +1,15 @@
+# 의존성 / 빌드 산출물
+node_modules/
+
+# 워드/PPT/PDF/이미지 등 사이트와 무관한 잡파일
+*.pdf
+*.pptx
+*.jpg
+*.jpeg
+*.png
+
+# 보안: 토큰/환경설정 파일은 절대 커밋 금지
+*.env
+.env
+*token*
+*secret*
