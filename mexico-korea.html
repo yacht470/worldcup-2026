@@ -146,7 +146,7 @@
   </header>
 
   <div class="panel">
-    <h2>👥 참가자 예측 <span class="tag">총 8명</span></h2>
+    <h2>👥 참가자 예측 <span class="tag">총 10명</span></h2>
     <div id="status" class="status off">실시간 연결 중…</div>
     <p class="hint">왼쪽 칸 = <b>멕시코 🇲🇽</b>, 오른쪽 칸 = <b>대한민국 🇰🇷</b> 점수. 입력하면 <b>모든 기기에 실시간 공유</b>됩니다.</p>
     <div id="players"></div>
@@ -197,8 +197,8 @@ const db = getDatabase(app);
 /* 이 게임 전용 데이터 경로 (월드컵 게임과 분리) */
 const PATH = "match_mex_kor";
 
-/* 참가자 8명 (가나다순) */
-const NAMES = ["김선우","김진호","김호경","노승민","오태웅","윤하영","정지우","조준연"];
+/* 참가자 10명 (가나다순) */
+const NAMES = ["김선우","김진호","김호경","노승민","오유진","오태웅","윤하영","정지우","조준연","황청조"];
 
 let state = { preds:{}, result:null };
 const rows = {};
