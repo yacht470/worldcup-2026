@@ -133,7 +133,7 @@
   <div class="panel">
     <h2>👥 참가자 예측 <span class="tag">총 11명 · 가나다순</span></h2>
     <div id="status" class="status off">실시간 연결 중…</div>
-    <p class="hint">이름 옆에서 우승 예상국을 고르면 <b>모든 기기에 실시간 공유</b>됩니다. (PC·모바일 어디서 봐도 동일)</p>
+    <p class="hint" id="phint">이름 옆에서 우승 예상국을 고르면 <b>모든 기기에 실시간 공유</b>됩니다. (PC·모바일 어디서 봐도 동일)</p>
     <div id="players"></div>
   </div>
 
@@ -207,6 +207,9 @@ TEAMS.forEach(grp => grp.list.forEach(([n,f]) => FLAG[n]=f));
 /* 로컬 미러 (Firebase가 진짜 원본) */
 let state = { picks:{}, winner:"" };
 
+/* 예측 마감 잠금: true면 참가자 픽 수정 불가 (맨 아래 우승국 입력만 가능) */
+const LOCKED = true;
+
 function teamOptions(selected){
   let html = `<option value="">— 우승 예상국 선택 —</option>`;
   TEAMS.forEach(grp=>{
@@ -230,20 +233,25 @@ function renderPlayers(){
     const chip = pick
       ? `<div class="chip has"><span class="flag">${FLAG[pick]||"🏳️"}</span>${pick}</div>`
       : `<div class="chip">미선택</div>`;
+    const control = LOCKED
+      ? `<div class="locked" style="flex:1 1 200px;min-width:160px;font-size:13px;font-weight:700;color:var(--muted);display:flex;align-items:center;gap:6px;">🔒 예측 확정</div>`
+      : `<select data-idx="${i}">${teamOptions(pick)}</select>`;
     row.innerHTML = `
       <div class="num">${i+1}</div>
       <div class="name">${name}</div>
-      <select data-idx="${i}">${teamOptions(pick)}</select>
+      ${control}
       ${chip}
       <span class="badge">🏆 WINNER!</span>`;
     box.appendChild(row);
   });
-  box.querySelectorAll("select").forEach(sel=>{
-    sel.addEventListener("change", ()=>{
-      const name = DEFAULT_NAMES[+sel.dataset.idx];
-      set(ref(db, "game/picks/" + name), sel.value || null);
+  if(!LOCKED){
+    box.querySelectorAll("select").forEach(sel=>{
+      sel.addEventListener("change", ()=>{
+        const name = DEFAULT_NAMES[+sel.dataset.idx];
+        set(ref(db, "game/picks/" + name), sel.value || null);
+      });
     });
-  });
+  }
 }
 
 function renderBanner(){
@@ -265,6 +273,12 @@ function renderAll(){ renderPlayers(); renderBanner(); }
 
 /* 우승국 선택 드롭다운은 한 번만 생성 (실시간 갱신 때 관리자 선택값 안 날아가게) */
 document.getElementById("winnerSelect").innerHTML = teamOptions("");
+
+/* 잠금 모드 UI: 안내문구 변경 + 전체 초기화 버튼 숨김 */
+if(LOCKED){
+  document.getElementById("phint").innerHTML = "🔒 예측이 <b>마감</b>되었습니다. 각자 고른 우승 예상국은 그대로 표시되며 <b>수정할 수 없습니다.</b> 우승국이 정해지면 맞춘 사람이 표시됩니다.";
+  document.getElementById("resetBtn").style.display = "none";
+}
 
 /* 버튼 핸들러 */
 document.getElementById("confirmBtn").addEventListener("click", ()=>{
